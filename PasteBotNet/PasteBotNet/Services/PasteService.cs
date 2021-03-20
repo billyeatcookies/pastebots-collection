@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
 using PasteMystNet;
 
 namespace PasteBotNet.Services
@@ -16,27 +14,14 @@ namespace PasteBotNet.Services
         private readonly DiscordSocketClient _discord;
         private static readonly Regex Regex = new(@"(\`{3}[a-z]*\n[\s\S]*?\n\`{3})");
         
-        private readonly CommandService _commands;
-        private readonly IConfigurationRoot _config;
-        private readonly IServiceProvider _provider;
-
-        
-        public PasteService(
-            DiscordSocketClient discord,
-            CommandService commands,
-            IConfigurationRoot config,
-            IServiceProvider provider)
+        public PasteService(DiscordSocketClient discord)
         {
             _discord = discord;
-            _commands = commands;
-            _config = config;
-            _provider = provider;
-
-            _discord.MessageReceived += OnMessageReceivedAsync;
+            _discord.MessageReceived += CheckMessage;
         }
 
 
-        private async Task OnMessageReceivedAsync(SocketMessage s)
+        private async Task CheckMessage(SocketMessage s)
         {
             #region checks
             
@@ -50,6 +35,22 @@ namespace PasteBotNet.Services
             if (msgWrappedLineCount <= 20) return;
 
             #endregion
+
+            var link = await PasteMessage(msg);
+            var resultEmbed = new EmbedBuilder()
+                .WithAuthor("Pasted!", msg.Author.GetAvatarUrl(), link)
+                .WithDescription(
+                    $"Code block by {msg.Author.Mention} was pasted on pastemyst!\n[Click here to view it!]({link})")
+                .WithColor(Color.Green)
+                .Build();
+
+            await msg.Channel.SendMessageAsync(embed: resultEmbed);
+            await msg.DeleteAsync();
+        }
+
+        private static async Task<string> PasteMessage(IMessage msg)
+        {
+            #region extraction
             
             var language = string.Empty;
             var code = string.Empty;
@@ -67,6 +68,10 @@ namespace PasteBotNet.Services
                 code = string.Join("\r\n", lines);
             }
             
+            #endregion
+
+            #region pasting
+
             var paste = new PasteMystPasteForm { ExpireDuration = PasteMystExpiration.OneHour };
             var pasties = new List<PasteMystPastyForm>();
             foreach (var match in matches)
@@ -82,18 +87,10 @@ namespace PasteBotNet.Services
             }
             paste.Pasties = pasties.ToArray();
             var result = await paste.PostPasteAsync();
+
+            #endregion
             
-            var link = $"https://paste.myst.rs/{result.Id}";
-
-            var resultEmbed = new EmbedBuilder()
-                .WithAuthor("Pasted!", msg.Author.GetAvatarUrl(), link)
-                .WithDescription(
-                    $"Code block by {msg.Author.Mention} was pasted on pastemyst!\n[Click here to view it!]({link})")
-                .WithColor(Color.Green)
-                .Build();
-
-            await msg.Channel.SendMessageAsync(embed: resultEmbed);
-            await msg.DeleteAsync();
+            return $"https://paste.myst.rs/{result.Id}";
         }
         
         private static bool IsCodeBlock(string content)
