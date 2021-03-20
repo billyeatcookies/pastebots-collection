@@ -5,6 +5,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# secrets
+config.json
+
 # C extensions
 *.so
 
@@ -16,7 +19,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/

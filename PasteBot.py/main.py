@@ -1,16 +1,23 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from discord.ext.commands import Bot
+from data.Extensions import Extensions
+from data.config import Config
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+class Client(Bot):
+    """
+    doc
+    """
+    def __init__(self, _extensions: Extensions, command_prefix, **options):
+        super().__init__(command_prefix, **options)
+        self.load_extensions(_extensions)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    def load_extensions(self, _extensions):
+        for extension in _extensions.get_all_extensions():
+            self.load_extension(extension)
+
+
+config = Config()
+extensions = Extensions()
+
+client = Client(extensions, config.get_prefix())
+client.run(config.get_token())

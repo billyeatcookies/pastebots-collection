@@ -1,0 +1,4 @@
+{
+  "events": "cogs.events.events",
+  "game": "cogs.commands.game"
+}
