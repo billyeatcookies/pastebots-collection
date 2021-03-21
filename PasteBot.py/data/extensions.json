@@ -1,4 +1,4 @@
 {
-  "events": "cogs.events.events",
-  "game": "cogs.commands.game"
+  "paste": "cogs.events.paste",
+  "events": "cogs.events.events"
 }
