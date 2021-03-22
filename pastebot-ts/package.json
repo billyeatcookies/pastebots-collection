@@ -1,0 +1,27 @@
+{
+  "name": "pastebot-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "dev": "tsc --build --watch tsconfig.json",
+    "start": "node ./build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/billyeatcookies/pastebots-collection"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/billyeatcookies/pastebots-collection/issues"
+  },
+  "homepage": "https://github.com/billyeatcookies/pastebots-collection#readme",
+  "dependencies": {
+    "@types/node": "^14.14.35",
+    "@types/ws": "^7.4.0",
+    "discord.js": "^12.5.1"
+  }
+}
