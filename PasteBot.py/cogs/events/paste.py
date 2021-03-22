@@ -32,17 +32,17 @@ class Paste(commands.Cog):
 
     @staticmethod
     async def paste_message(msg):
-        # language = ""
+        language = ""
         code = ""
 
         matches = re.findall(regex, msg)
 
         for match in matches:
             lines = re.split("\n", match)
-            # lines[0] = lines[0].lstrip("`")
-            #
-            # if len(lines[0]) > 0:
-            #     language = lines[0]
+            lines[0] = lines[0].lstrip("`")
+
+            if len(lines[0]) > 0:
+                language = lines[0]
             lines.pop(0)
             lines.pop(len(lines) - 1)
             code = "\n".join(lines)
@@ -52,16 +52,16 @@ class Paste(commands.Cog):
 
         for match in matches:
             pasty = pastemyst.Pasty(code=code)
-            pasty.language = pastemyst.Language.AUTODETECT
-            # if not language.isspace() or language.strip():
-            #     pastemyst_language = client.get_language_info(ext=language)
-            #     pasty.language = pastemyst_language.name
+            # pasty.language = pastemyst.Language.AUTODETECT
+            if not language.isspace() or language.strip():
+                pastemyst_language = client.get_language_info(ext=language)
+                pasty.language = pastemyst_language.name
             pasties.append(pasty)
 
         paste.pasties = pasties
         result = client.create_paste(paste=paste)
 
-        return f"https://paste.myst.rs/{result._id}"
+        return f"https://paste.myst.rs/{result.id}"
 
 
 def setup(bot):
